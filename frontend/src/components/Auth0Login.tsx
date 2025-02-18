@@ -6,7 +6,7 @@ import { Button, VStack, Text } from "@chakra-ui/react";
 export const Auth0Login = () => {
   const { loginWithRedirect, logout, user, isAuthenticated } = useAuth0();
 
-  
+
 
   return (
     <VStack  mt={10}>
@@ -16,10 +16,12 @@ export const Auth0Login = () => {
           <Button onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}>
             Logout
           </Button>
-          <Button onClick={() => console.log(user)} >show user</Button>
         </>
       ) : (
-        <Button onClick={() => loginWithRedirect()}>Login</Button>
+        <>
+          <Text>Howdy there! Login to customise th books list</Text>
+          <Button onClick={() => loginWithRedirect()}>Login</Button>
+        </>
       )}
     </VStack>
   );

@@ -13,7 +13,6 @@ const App = () => {
   return (
     <ApolloProvider client={client}>
       <div>
-        hello 
         <Auth0Login />
         <BooksList />
       </div>
