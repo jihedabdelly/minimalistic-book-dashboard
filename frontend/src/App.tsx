@@ -4,7 +4,7 @@ const App = () => {
   return (
     <div>
       hello 
-      {<Auth0Login />}
+      <Auth0Login />
     </div>
   )
 };

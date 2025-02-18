@@ -6,6 +6,8 @@ import { Button, VStack, Text } from "@chakra-ui/react";
 export const Auth0Login = () => {
   const { loginWithRedirect, logout, user, isAuthenticated } = useAuth0();
 
+  
+
   return (
     <VStack  mt={10}>
       {isAuthenticated ? (
