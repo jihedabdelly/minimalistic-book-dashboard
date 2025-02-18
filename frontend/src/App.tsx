@@ -1,9 +1,10 @@
-
+import { Auth0Login} from './components/Auth0Login';
 
 const App = () => {
   return (
     <div>
-      hello
+      hello 
+      {<Auth0Login />}
     </div>
   )
 };
