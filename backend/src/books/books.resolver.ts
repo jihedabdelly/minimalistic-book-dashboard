@@ -1,21 +1,43 @@
-import { Query, Resolver } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { Book } from './book.model';
+import { BooksService } from './books.service';
 
 @Resolver(() => Book)
 export class BooksResolver {
-  // Mock data - before adding a database
-  private books: Book[] = [
-    { id: 1, name: 'The Great Gatsby', description: 'A story of decadence and excess.' },
-    { id: 2, name: '1984', description: 'A dystopian social science fiction.' },
-  ];
+  constructor(private booksService: BooksService) {}
 
   @Query(() => [Book])
   async getBooks(): Promise<Book[]> {
-    return this.books;
+    return this.booksService.findAll();
   }
 
-  @Query(() => Book, { nullable: true })
-  async getBook(id: number): Promise<Book | undefined> {
-    return this.books.find(book => book.id === id);
+  @Query(() => Book)
+  async getBook(@Args('id') id: number): Promise<Book> {
+    return this.booksService.findOne(id);
+  }
+
+  @Mutation(() => Book)
+  async createBook(
+    @Args('name') name: string,
+    @Args('description') description: string,
+  ): Promise<Book> {
+    return this.booksService.create({ name, description });
+  }
+
+  @Mutation(() => Book)
+  async updateBook(
+    @Args('id') id: number,
+    @Args('name', { nullable: true }) name?: string,
+    @Args('description', { nullable: true }) description?: string,
+  ): Promise<Book> {
+    const updateData: Partial<Book> = {};
+    if (name !== undefined) updateData.name = name;
+    if (description !== undefined) updateData.description = description;
+    return this.booksService.update(id, updateData);
+  }
+
+  @Mutation(() => Boolean)
+  async deleteBook(@Args('id') id: number): Promise<boolean> {
+    return this.booksService.delete(id);
   }
 }

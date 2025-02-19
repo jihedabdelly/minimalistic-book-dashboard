@@ -8,7 +8,13 @@ type Book {
   name: String!
 }
 
+type Mutation {
+  createBook(description: String!, name: String!): Book!
+  deleteBook(id: Float!): Boolean!
+  updateBook(description: String, id: Float!, name: String): Book!
+}
+
 type Query {
-  getBook: Book
+  getBook(id: Float!): Book!
   getBooks: [Book!]!
 }
