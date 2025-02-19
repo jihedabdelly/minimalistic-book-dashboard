@@ -12,17 +12,26 @@ const App = () => {
     uri: 'http://localhost:8080/graphql',
   });
 
-  const authLink = setContext(async (_, { headers }) => {
-    // Get the authentication token from Auth0
-    const token = await getAccessTokenSilently();
-    
-    // Return the headers to the context so httpLink can read them
-    return {
-      headers: {
-        ...headers,
-        authorization: token ? `Bearer ${token}` : '',
-      },
-    };
+  const authLink = setContext(async (operation, { headers }) => {
+    // Only add the auth token for mutations
+    if (operation.query.definitions.some(
+      def => def.kind === 'OperationDefinition' && def.operation === 'mutation'
+    )) {
+      try {
+        const token = await getAccessTokenSilently();
+        return {
+          headers: {
+            ...headers,
+            authorization: `Bearer ${token}`,
+          },
+        };
+      } catch (e) {
+        // If getting token fails, proceed without token
+        return { headers };
+      }
+    }
+    // For queries, don't add auth header
+    return { headers };
   });
 
   // Initialize Apollo Client

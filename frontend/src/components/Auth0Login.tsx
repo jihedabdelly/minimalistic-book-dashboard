@@ -19,7 +19,7 @@ export const Auth0Login = () => {
         </>
       ) : (
         <>
-          <Text>Howdy there! Login to customise th books list</Text>
+          <Text>Howdy there! Login to customise the books list</Text>
           <Button onClick={() => loginWithRedirect()}>Login</Button>
         </>
       )}
