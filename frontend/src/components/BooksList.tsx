@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useQuery } from '@apollo/client';
 import { Button, IconButton, Table, Flex, Heading } from '@chakra-ui/react';
 import { FaTrash, FaEdit } from "react-icons/fa";
@@ -5,11 +6,13 @@ import { PiEmpty } from "react-icons/pi";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Book } from '../types/book';
 import { GET_BOOKS } from '../graphql/queries';
+import { BookDialog } from './BookDialog';
 
 
 export const BooksList = () => {
-  const { loading, error, data } = useQuery<{ getBooks: Book[] }>(GET_BOOKS);
+  const { loading, error, data, refetch } = useQuery<{ getBooks: Book[] }>(GET_BOOKS);
   const { isAuthenticated } = useAuth0();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
 
   if (loading) return <p>Loading...</p>;
@@ -17,9 +20,16 @@ export const BooksList = () => {
 
   return (
     <Flex direction="column" p={4}>
+      <BookDialog 
+        isOpen={isDialogOpen}
+        onClose={() => {
+          setIsDialogOpen(false);
+          refetch(); // Refresh the books list after adding
+        }}
+      />
       <Flex justify="space-between" align="center" mb={4}>
         <Heading size="lg">Books List</Heading>
-        {isAuthenticated && <Button colorScheme="blue">Add Book</Button>}
+        {isAuthenticated && <Button colorScheme="blue" onClick={() => setIsDialogOpen(true)} >Add Book</Button>}
       </Flex>
       <Table.Root>
         <Table.Header>
