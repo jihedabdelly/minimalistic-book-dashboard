@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
 import { Book } from './book.model';
 import { BooksService } from './books.service';
 import { RequireAuth } from 'src/auth/auth.decorator';
@@ -14,7 +14,7 @@ export class BooksResolver {
   }
 
   @Query(() => Book)
-  async getBook(@Args('id') id: number): Promise<Book> {
+  async getBook(@Args('id', { type: () => ID }) id: number): Promise<Book> {
     return this.booksService.findOne(id);
   }
 
@@ -31,7 +31,7 @@ export class BooksResolver {
   @Mutation(() => Book)
   @RequireAuth()
   async updateBook(
-    @Args('id') id: number,
+    @Args('id', { type: () => ID }) id: number,
     @Args('name', { nullable: true }) name?: string,
     @Args('description', { nullable: true }) description?: string,
   ): Promise<Book> {
@@ -43,7 +43,7 @@ export class BooksResolver {
 
   @Mutation(() => Boolean)
   @RequireAuth()
-  async deleteBook(@Args('id') id: number): Promise<boolean> {
+  async deleteBook(@Args('id', { type: () => ID }) id: number): Promise<boolean> {
     return this.booksService.delete(id);
   }
 }
