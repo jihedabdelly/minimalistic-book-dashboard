@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   DialogRoot,
   DialogContent,
@@ -11,20 +11,36 @@ import {
   Center,
 } from '@chakra-ui/react';
 import { useMutation } from '@apollo/client';
-import { CREATE_BOOK } from '../graphql/mutations';
+import { CREATE_BOOK, UPDATE_BOOK } from '../graphql/mutations';
 
 
 
 interface BookDialogProps {
   isOpen: boolean;
   onClose: () => void;
+  context: "add" | "edit";
+  book?: {
+    id: number;
+    name: string;
+    description: string;
+  };
 }
 
-export const BookDialog: React.FC<BookDialogProps> = ({ isOpen, onClose }) => {
+export const BookDialog: React.FC<BookDialogProps> = ({ isOpen, onClose, context = "add", book}) => {
+  /* const [name, setName] = useState(context === "edit" ? book?.name || '' : '');
+  const [description, setDescription] = useState(context === "edit" ? book?.description || '' : ''); */
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
 
-  const [createBook, { loading }] = useMutation(CREATE_BOOK, {
+  const [createBook, { loading: loadingAdd }] = useMutation(CREATE_BOOK, {
+    onCompleted: () => {
+      onClose();
+      setName('');
+      setDescription('');
+    },
+  });
+
+  const [updateBook, { loading: loadingEdit }] = useMutation(UPDATE_BOOK, {
     onCompleted: () => {
       onClose();
       setName('');
@@ -34,22 +50,47 @@ export const BookDialog: React.FC<BookDialogProps> = ({ isOpen, onClose }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !description.trim()) return;
+    if (context === "add") {
+      if (!name.trim() || !description.trim()) return;
 
-    await createBook({
-      variables: {
-        name,
-        description,
-      },
-    });
+      await createBook({
+        variables: {
+          name: name.trim(),
+          description: description.trim(),
+        },
+      });
+
+    } else if (context === "edit") {
+      await updateBook({
+        variables: {
+          id: book?.id,
+          name: name.trim(),
+          description: description.trim(),
+        },
+      });
+    }
+    
   };
+
+
+  useEffect(() => {
+    if (context === "edit" && book) {
+      setName(book.name);
+      setDescription(book.description);
+    } else {
+      setName('');
+      setDescription('');
+    }
+  }, [context, isOpen]);
+
+
 
   return (
     <DialogRoot open={isOpen} onOpenChange={() => onClose()}>
-      <DialogContent margin="auto" padding={6} width="500px">
+      <DialogContent padding={6} >
         <DialogHeader>
           <Center>
-            <DialogTitle>Add New Book</DialogTitle>
+            <DialogTitle>{context === "add" ? "Add New Book" : "Update the Book"}</DialogTitle>
           </Center>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
@@ -69,14 +110,22 @@ export const BookDialog: React.FC<BookDialogProps> = ({ isOpen, onClose }) => {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Enter book description"
+                autoresize
                 required
               />
             </div>
             <Center>
               <Flex gap={4}>
-                <Button type="submit" disabled={loading}>
-                  Save
-                </Button>
+                {context === "edit" && (
+                  <Button type="submit" disabled={loadingEdit}>
+                    Update
+                  </Button>
+                )}
+                {context === "add" && (
+                  <Button type="submit" disabled={loadingAdd}>
+                    Add
+                  </Button>
+                )}
                 <Button variant="outline" onClick={onClose}>
                   Cancel
                 </Button>

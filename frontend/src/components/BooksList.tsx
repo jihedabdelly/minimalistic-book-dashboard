@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
-import { Button, IconButton, Table, Flex, Heading } from '@chakra-ui/react';
+import { Button, IconButton, Table, Flex, Heading, Text, Center } from '@chakra-ui/react';
 import { FaTrash, FaEdit } from "react-icons/fa";
 import { PiEmpty } from "react-icons/pi";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -18,6 +18,8 @@ import {
 
 export const BooksList = () => {
   const { loading, error, data, refetch } = useQuery<{ getBooks: Book[] }>(GET_BOOKS);
+  const [dialogContext, setDialogContext] = useState<"add" | "edit">("add");
+  const [selectedBook, setSelectedBook] = useState<Book | undefined>(undefined);
   const { isAuthenticated } = useAuth0();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -46,28 +48,56 @@ export const BooksList = () => {
           setIsDialogOpen(false);
           refetch(); // Refresh the books list after adding
         }}
+        context={dialogContext}
+        book={selectedBook}
       />
       <Flex justify="space-between" align="center" mb={4}>
-        <Heading size="lg">Books List</Heading>
-        {isAuthenticated && <Button colorScheme="blue" onClick={() => setIsDialogOpen(true)} >Add Book</Button>}
+        <Heading size="2xl">Books List</Heading>
+        {isAuthenticated && 
+          <Button colorScheme="blue" onClick={() => {setDialogContext("add"), setIsDialogOpen(true)}} >
+            Add Book
+          </Button>
+        }
       </Flex>
-      <Table.Root interactive>
-        <Table.Header>
-          <Table.Row>
-            <Table.ColumnHeader>Name</Table.ColumnHeader>
-            <Table.ColumnHeader>Description</Table.ColumnHeader>
-            <Table.ColumnHeader>Actions</Table.ColumnHeader>
+      <Table.Root interactive >
+        <Table.Header >
+          <Table.Row justifyContent="space-between" >
+            <Table.ColumnHeader>
+              <Text fontWeight="bold" >
+                Name
+              </Text>
+
+            </Table.ColumnHeader>
+            <Table.ColumnHeader>
+              <Text fontWeight="bold" >
+                Description
+              </Text>
+            </Table.ColumnHeader>
+            <Table.ColumnHeader textAlign={"end"} >
+              <Center>
+                <Text fontWeight="bold" >
+                  Actions
+                </Text>
+
+              </Center>
+            </Table.ColumnHeader>
           </Table.Row>
         </Table.Header>
         <Table.Body>
           {data?.getBooks.map((book) => (
             <Table.Row key={book.id} >
-              <Table.Cell>{book.name}</Table.Cell>
-              <Table.Cell>{book.description}</Table.Cell>
+              <Table.Cell >
+                {book.name}
+              </Table.Cell>
               <Table.Cell>
+                <Text>
+                  {book.description}
+                </Text>
+              </Table.Cell>
+              <Table.Cell textAlign={"end"}>
                 {isAuthenticated ?
-                  <Flex>
-                    <IconButton aria-label="Edit book" mr={2} >
+                  < Center >
+                    <IconButton aria-label="Edit book" mr={2} onClick={() => { setDialogContext("edit"), setSelectedBook(book), setIsDialogOpen(true) }} >
                       <FaEdit />
                     </IconButton>
 
@@ -87,11 +117,14 @@ export const BooksList = () => {
                         </MenuItem>
                       </MenuContent>
                     </MenuRoot>
-                  
-                  </Flex> : 
-                  <IconButton aria-label="No action" variant="subtle" disabled >
+
+                  </Center > : 
+                  <Center>
+                   <IconButton aria-label="No action" variant="subtle" disabled >
                     <PiEmpty />
-                  </IconButton>
+                  </IconButton> 
+                  </Center>
+                  
                 }
               </Table.Cell>
             </Table.Row>
