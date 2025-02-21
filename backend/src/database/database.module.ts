@@ -8,7 +8,7 @@ import { Book } from '../books/book.model';
       type: 'sqlite',
       database: 'data/books.db',
       entities: [Book],
-      synchronize: false, // Set to false in production
+      synchronize: true, // Set to false in production
     }),
   ],
 })
