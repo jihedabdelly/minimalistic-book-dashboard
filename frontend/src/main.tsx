@@ -1,5 +1,7 @@
 import ReactDOM from "react-dom/client";
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
+import { ColorModeProvider } from "./components/ui/color-mode";
+
 import { Auth0Provider } from "@auth0/auth0-react";
 import App from "./App";
 
@@ -14,7 +16,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     }}
   >
     <ChakraProvider value={defaultSystem}>
-      <App />
+      <ColorModeProvider>
+        <App />
+      </ColorModeProvider>
     </ChakraProvider>
   </Auth0Provider>
 );

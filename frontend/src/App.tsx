@@ -1,15 +1,17 @@
 import { ApolloClient, InMemoryCache, createHttpLink, ApolloProvider } from '@apollo/client';
+import { ColorModeButton } from './components/ui/color-mode'; 
 import { setContext } from '@apollo/client/link/context';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Auth0Login} from './components/Auth0Login';
 import { BooksList } from './components/BooksList';
+import { Center } from '@chakra-ui/react';
 
 
 const App = () => {
   const { getAccessTokenSilently } = useAuth0();
 
   const httpLink = createHttpLink({
-    uri: 'http://localhost:8080/graphql',
+    uri:  import.meta.env.VITE_AUTH0_AUDIENCE + "graphql",
   });
 
   const authLink = setContext(async (operation, { headers }) => {
@@ -44,6 +46,10 @@ const App = () => {
   return (
     <ApolloProvider client={client}>
       <div>
+        <Center marginTop={10}>
+         <ColorModeButton /> 
+        </Center>
+        
         <Auth0Login />
         <BooksList />
       </div>
