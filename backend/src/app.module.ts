@@ -17,6 +17,7 @@ import { AuthModule } from './auth/auth.module';
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       sortSchema: true,
       context: ({ req }) => ({ req }), // Make request available in context
+      csrfPrevention: false, // Disable CSRF prevention
     }),
     BooksModule,
     DatabaseModule,

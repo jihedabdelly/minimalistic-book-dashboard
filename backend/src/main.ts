@@ -7,6 +7,14 @@ async function bootstrap() {
   // Enable CORS
   app.enableCors({
     origin: process.env.FRONTEND_URL,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'Accept',
+      'x-apollo-operation-name',
+      'apollo-require-preflight'
+    ],
     credentials: true,
   });
 
